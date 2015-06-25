@@ -4,8 +4,11 @@ The tiny file splitter and joiner written in C++. One of my first projects from 
 # How to build
 The build system used for this project is CMake. To build the project in GNU/Linux, simply do the following:
   > mkdir build
+  
   > cd build
+  
   > cmake ../
+  
 By executing the above commands, the build process happens in the ./build directory. The resulting executable is a test program.
 
 # Using as a library
