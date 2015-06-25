@@ -1,5 +1,5 @@
-# divine
-The tiny file splitter and joiner written in C++. One of my first projects from 2009.
+# Description
+Divine - the tiny file splitter and joiner written in C++. One of my first projects from 2009.
 
 # How to build
 The build system used for this project is CMake. To build the project in GNU/Linux, simply do the following:
