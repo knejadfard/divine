@@ -64,7 +64,7 @@ unsigned long file_size(const std::string& filename)
 {
     std::ifstream file(filename, std::ios::binary | std::ios::ate);
     if( !file.is_open() ) {
-        throw std::runtime_error("Cannot determine size for "+filename);
+        throw std::runtime_error("Cannot open file \""+filename+"\"");
     }
     return file.tellg();
 }
