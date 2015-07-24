@@ -12,19 +12,21 @@
  * performed by utilizing a buffer.                  *
  * Buffer's size is defined in constants.h           *
  ****************************************************/
-void transfer(std::istream& in, std::ostream& out) {
+void transfer(std::istream& in, std::ostream& out, unsigned long to_read) {
     if(!in || !out) {
-        throw std::runtime_error("Exception occured in one of the file streams!");
+        throw std::runtime_error("transfer function error: one of the I/O streams is not open.");
     }
-    char *buffer = new char[buffer_size];
+    unsigned long actual_buffer_size = buffer_size > to_read ? to_read : buffer_size;
+    char *buffer = new char[actual_buffer_size];
     do {
         //try to read enough data to fill the buffer
-        in.read(buffer, buffer_size);
+        in.read(buffer, actual_buffer_size);
         //only writes as much as read in previous line
         //this way there is no need for an extra iteration
         //at the end of the loop for possible remaining data.
         out.write(buffer, in.gcount());
-    } while(in.gcount() > 0);
+        to_read -= in.gcount();
+    } while(to_read > 0 && in.gcount() > 0);
     delete[] buffer;
 }
 
