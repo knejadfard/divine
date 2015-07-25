@@ -25,6 +25,12 @@ public:
 
 private:
 
+    /***************
+     * member data *
+     **************/
+    std::string _filename;
+    unsigned long _part_size;
+
     /*************************
      * introduce the program *
      ************************/
@@ -44,6 +50,11 @@ private:
      * analyze a command and act accordingly *
      ****************************************/
     void act(const std::string& command);
+
+    /********************************************
+     * split a file into parts of specific size *
+     ********************************************/
+    void split();
 
 };
 
@@ -79,41 +90,46 @@ std::string ui::input(const std::string& message) {
 
 void ui::act(const std::string& command) {
     std::stringstream sstr{command};
-    std::string task, filename; //the two mandatory parts of a command
-    if( !(sstr>>task>>filename) ) {
+    std::string task; //the two mandatory parts of a command
+    if( !(sstr>>task>>_filename) ) {
         throw std::runtime_error("Missing file name in command.");
     }
     if(task == "split") {
-        std::string part_size;
-        if( !(sstr>>part_size) ) {
+        std::string str_part_size;
+        if( !(sstr>>str_part_size) ) {
             throw std::runtime_error("Missing size for file parts.");
         }
-        unsigned long size = file_size(filename);
-        unsigned long ul_part_size = convert_size(part_size);
-        unsigned long parts_count = count_parts(size, ul_part_size);
-        std::cout<<"Size of "<<filename<<" -> "<<size<<std::endl;
-        std::cout<<"After splitting, "<<parts_count<<" part(s) will be created."<<std::endl;
-        std::string answer = input("Proceed? (enter \"y\" to confirm) ");
-        if(answer == "y") {
-            std::ifstream in(filename, std::ios::binary);
-            std::ofstream out;
-            if(!in) {
-                throw std::runtime_error("Error opening file \""+filename+"\".");
-            }
-            for(unsigned long i = 1; i <= parts_count; ++i) {
-                out.open(filename+"-part"+std::to_string(i), std::ios::binary | std::ios::trunc);
-                if(!out) {
-                    throw std::runtime_error("Error opening output file for part "+std::to_string(i)+".");
-                }
-                transfer(in, out, ul_part_size);
-                out.close();
-            }
-            in.close();
-        }
+        _part_size = convert_size(str_part_size);
+        split();
     } else if(task == "merge") {
         std::cout<<"Merge command given"<<std::endl;
+        //merge
     } else {
         throw std::runtime_error("Unknown command: "+task);
+    }
+}
+
+void ui::split() {
+    unsigned long size = file_size(_filename);
+    unsigned long parts_count = count_parts(size, _part_size);
+    std::cout<<"Size of "<<_filename<<" -> "<<size<<std::endl;
+    std::cout<<"After splitting, "<<parts_count<<" part(s) will be created."<<std::endl;
+    std::string answer = input("Proceed? (enter \"y\" to confirm) ");
+    if(answer == "y") {
+        std::ifstream in(_filename, std::ios::binary);
+        std::ofstream out;
+        if(!in) {
+            throw std::runtime_error("Error opening file \""+_filename+"\".");
+        }
+        for(unsigned long i = 1; i <= parts_count; ++i) {
+            out.open(_filename+"-part"+std::to_string(i), std::ios::binary | std::ios::trunc);
+            if(!out) {
+                throw std::runtime_error("Error opening output file for part "+std::to_string(i)+".");
+            }
+            transfer(in, out, _part_size);
+            out.close();
+        }
+        in.close();
     }
 }
 
