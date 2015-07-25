@@ -16,6 +16,7 @@ void transfer(std::istream& in, std::ostream& out, unsigned long to_read) {
     if(!in || !out) {
         throw std::runtime_error("transfer function error: one of the I/O streams is not open.");
     }
+    //if buffer_size is larger than the amount of data to read, there is no point to use the buffer
     unsigned long actual_buffer_size = buffer_size > to_read ? to_read : buffer_size;
     char *buffer = new char[actual_buffer_size];
     do {
