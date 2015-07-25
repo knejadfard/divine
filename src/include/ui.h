@@ -56,6 +56,11 @@ private:
      ********************************************/
     void split();
 
+    /*********************************************
+     * merge file parts to produce a single file *
+     ********************************************/
+    void merge();
+
 };
 
 
@@ -102,8 +107,8 @@ void ui::act(const std::string& command) {
         _part_size = convert_size(str_part_size);
         split();
     } else if(task == "merge") {
-        std::cout<<"Merge command given"<<std::endl;
-        //merge
+        std::cout<<"Analyzing parts..."<<std::endl;
+        merge();
     } else {
         throw std::runtime_error("Unknown command: "+task);
     }
@@ -128,6 +133,26 @@ void ui::split() {
             }
             transfer(in, out, _part_size);
             out.close();
+        }
+        in.close();
+    }
+}
+
+void ui::merge() {
+    std::ifstream in;
+    //TODO: check for file's existance and ask for confirmation
+    std::ofstream out(_filename, std::ios::out | std::ios::trunc);
+    unsigned int i = 1;
+    while(true) {
+        in.open(_filename+"-part"+std::to_string(i), std::ios::binary);
+        if(in) {
+            std::cout<<"   found part "<<i<<". Writing...";
+            transfer(in, out, file_size(in));
+            std::cout<<" Done!"<<std::endl;
+            ++i;
+        } else {
+            std::cout<<"No more parts to write. Operation has finished after writing "<<i-1<<" parts."<<std::endl;
+            break;
         }
         in.close();
     }

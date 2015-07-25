@@ -69,4 +69,12 @@ unsigned long file_size(const std::string& filename)
     return file.tellg();
 }
 
+unsigned long file_size(std::istream& input) {
+    std::streampos original_position = input.tellg();
+    input.seekg(0, std::ios::end);
+    std::streampos end = input.tellg();
+    input.seekg(original_position);
+    return end;
+}
+
 #endif
