@@ -57,9 +57,12 @@ unsigned long convert_size(const std::string& str)
     return value;
 }
 
-/**********************************
- * Returns a file's size in bytes *
- *********************************/
+/***********************************
+ * Returns a file's size in bytes. *
+ * important note: opens a new     *
+ * stream! Should not be used when *
+ * the stream is already open.     *
+ **********************************/
 unsigned long file_size(const std::string& filename)
 {
     std::ifstream file(filename, std::ios::binary | std::ios::ate);
@@ -69,7 +72,16 @@ unsigned long file_size(const std::string& filename)
     return file.tellg();
 }
 
-unsigned long file_size(std::istream& input) {
+/***********************************
+ * Returns a file's size in bytes. *
+ * takes an already open file      *
+ * input file stream and reserves  *
+ * the current reading point.      *
+ **********************************/
+unsigned long file_size(std::ifstream& input) {
+    if( !input.is_open() ) {
+        throw std::runtime_error("Cannot determine file size because the input file stream is not open.");
+    }
     std::streampos original_position = input.tellg();
     input.seekg(0, std::ios::end);
     std::streampos end = input.tellg();
